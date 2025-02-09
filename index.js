@@ -13,7 +13,7 @@ async function run() {
         const database = client.db('rankMaster');
 
         const port = process.env.PORT || 3000;
-        app.listen(port, () => console.log('listening on port ${port}...'));
+        app.listen(port, () => console.log(`listening on port ${port}...`));
 
         // dummy
         app.get('/', (req, res) => {
@@ -30,19 +30,20 @@ async function run() {
             const skip = 0;
 
             // query
-            const cursor = scores.find(query).sort(sort).limit(limit).skip(0);
+            const cursor = scores.find(query).sort(sort).limit(limit).skip(skip);
             for await (const record of cursor) {
                 res.send(record);
             }
         })
 
         // スコア登録
-        app.post('/:game/:score', (req, res) => {
+        app.post('/:game/:name/:score', (req, res) => {
             const scores = database.collection(req.params.game);
+            const date = new Date();
             const record = {
                 name: req.params.name,
-                date: req.params.date,
-                score: req.params.score
+                date: date,
+                score: parseInt(req.params.score)
             };
 
             scores.insertOne(record);
